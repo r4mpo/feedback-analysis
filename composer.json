@@ -13,5 +13,13 @@
     ],
     "require-dev": {
         "phpunit/phpunit": "^9.6"
+    },
+    "require": {
+        "codewithkyrian/transformers": "^0.6.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "codewithkyrian/platform-package-installer": true
+        }
     }
 }

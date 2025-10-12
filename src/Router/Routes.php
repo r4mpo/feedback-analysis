@@ -16,6 +16,7 @@ class Routes
     {
         return [
             '/' => 'HomeController@index',
+            '/feedback-analysis' => 'FeedbackController@analyze',
         ];
     }
 }

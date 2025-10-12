@@ -4,6 +4,7 @@
 class FeedbackAnalyzer {
     constructor() {
         this.history = [];
+        this.base_url = document.getElementById('base_url').value;
         this.stats = {
             positive: 0,
             neutral: 0,
@@ -15,41 +16,62 @@ class FeedbackAnalyzer {
     init() {
         // Load history from localStorage
         this.loadHistory();
-        
+
         // Event listeners
         document.getElementById('feedbackForm').addEventListener('submit', (e) => this.handleSubmit(e));
         document.getElementById('clearBtn').addEventListener('click', () => this.clearForm());
         document.getElementById('clearHistoryBtn').addEventListener('click', () => this.clearHistory());
-        
+
         // Update UI
         this.updateStats();
         this.renderHistory();
     }
 
-    // SUBSTITUIR POR API CHAMADA AO BACKEND PHP
-    // Simulate sentiment analysis (in production, this would call your PHP backend)
     async analyzeSentiment(text) {
+        fetch(this.base_url + '/feedback-analysis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: new URLSearchParams({
+                'text': text
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição: ' + response.status);
+                }
+                return response.json(); // converte a resposta para JSON
+            })
+            .then(data => {
+                console.log('Resposta da API:', data);
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
+return;
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         // Simple keyword-based sentiment analysis for demo purposes
         const positiveWords = ['bom', 'ótimo', 'excelente', 'maravilhoso', 'perfeito', 'adorei', 'amei', 'incrível', 'fantástico', 'feliz', 'satisfeito'];
         const negativeWords = ['ruim', 'péssimo', 'horrível', 'terrível', 'odiei', 'decepcionante', 'insatisfeito', 'problema', 'defeito', 'lento'];
-        
+
         const lowerText = text.toLowerCase();
         let positiveCount = 0;
         let negativeCount = 0;
-        
+
         positiveWords.forEach(word => {
             if (lowerText.includes(word)) positiveCount++;
         });
-        
+
         negativeWords.forEach(word => {
             if (lowerText.includes(word)) negativeCount++;
         });
-        
+
         let sentiment, score;
-        
+
         if (positiveCount > negativeCount) {
             sentiment = 'POSITIVE';
             score = 0.75 + (Math.random() * 0.24); // 0.75 - 0.99
@@ -60,7 +82,7 @@ class FeedbackAnalyzer {
             sentiment = 'NEUTRAL';
             score = 0.50 + (Math.random() * 0.30);
         }
-        
+
         return {
             label: sentiment,
             score: score
@@ -69,19 +91,19 @@ class FeedbackAnalyzer {
 
     async handleSubmit(e) {
         e.preventDefault();
-        
+
         const textarea = document.getElementById('feedbackText');
         const text = textarea.value.trim();
-        
+
         if (!text) return;
-        
+
         // Show loading state
         this.showLoading();
-        
+
         try {
             // Analyze sentiment
             const result = await this.analyzeSentiment(text);
-            
+
             // Create feedback entry
             const entry = {
                 id: Date.now(),
@@ -90,24 +112,24 @@ class FeedbackAnalyzer {
                 score: result.score,
                 timestamp: new Date().toISOString()
             };
-            
+
             // Add to history
             this.history.unshift(entry);
             this.saveHistory();
-            
+
             // Update stats
             this.updateStatsCount(result.label);
-            
+
             // Display result
             this.displayResult(entry);
-            
+
             // Update UI
             this.renderHistory();
             this.updateStats();
-            
+
             // Clear form
             textarea.value = '';
-            
+
         } catch (error) {
             console.error('Error analyzing feedback:', error);
             alert('Erro ao analisar o feedback. Por favor, tente novamente.');
@@ -131,7 +153,7 @@ class FeedbackAnalyzer {
         const container = document.getElementById('resultContainer');
         const sentimentLabel = this.getSentimentLabel(entry.sentiment);
         const sentimentClass = entry.sentiment.toLowerCase();
-        
+
         container.innerHTML = `
             <div class="result-card">
                 <div class="result-header">
@@ -147,7 +169,7 @@ class FeedbackAnalyzer {
 
     renderHistory() {
         const container = document.getElementById('historyContainer');
-        
+
         if (this.history.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
@@ -162,7 +184,7 @@ class FeedbackAnalyzer {
             `;
             return;
         }
-        
+
         const historyHTML = this.history.map(entry => `
             <div class="history-item" onclick="feedbackAnalyzer.showHistoryDetail(${entry.id})">
                 <div class="history-header">
@@ -175,7 +197,7 @@ class FeedbackAnalyzer {
                 <div class="history-time">${this.formatTime(entry.timestamp)}</div>
             </div>
         `).join('');
-        
+
         container.innerHTML = historyHTML;
     }
 
@@ -200,10 +222,10 @@ class FeedbackAnalyzer {
         document.getElementById('positiveCount').textContent = this.stats.positive;
         document.getElementById('neutralCount').textContent = this.stats.neutral;
         document.getElementById('negativeCount').textContent = this.stats.negative;
-        
+
         const total = this.stats.positive + this.stats.neutral + this.stats.negative;
         document.getElementById('totalAnalyzed').textContent = total;
-        
+
         if (total > 0) {
             const avgSentiment = ((this.stats.positive - this.stats.negative) / total * 100).toFixed(0);
             document.getElementById('avgSentiment').textContent = `${avgSentiment > 0 ? '+' : ''}${avgSentiment}%`;
@@ -227,7 +249,7 @@ class FeedbackAnalyzer {
             this.saveHistory();
             this.renderHistory();
             this.updateStats();
-            
+
             const container = document.getElementById('resultContainer');
             container.innerHTML = `
                 <div class="empty-state">
@@ -250,11 +272,11 @@ class FeedbackAnalyzer {
     loadHistory() {
         const savedHistory = localStorage.getItem('feedbackHistory');
         const savedStats = localStorage.getItem('feedbackStats');
-        
+
         if (savedHistory) {
             this.history = JSON.parse(savedHistory);
         }
-        
+
         if (savedStats) {
             this.stats = JSON.parse(savedStats);
         }
@@ -282,16 +304,16 @@ class FeedbackAnalyzer {
         const date = new Date(timestamp);
         const now = new Date();
         const diff = now - date;
-        
+
         const minutes = Math.floor(diff / 60000);
         const hours = Math.floor(diff / 3600000);
         const days = Math.floor(diff / 86400000);
-        
+
         if (minutes < 1) return 'Agora mesmo';
         if (minutes < 60) return `${minutes} minuto${minutes > 1 ? 's' : ''} atrás`;
         if (hours < 24) return `${hours} hora${hours > 1 ? 's' : ''} atrás`;
         if (days < 7) return `${days} dia${days > 1 ? 's' : ''} atrás`;
-        
+
         return date.toLocaleDateString('pt-BR');
     }
 

@@ -34,7 +34,7 @@
     <section class="input-section">
       <div class="card">
         <h2 class="section-title">Analisar Novo Feedback</h2>
-        <form id="feedbackForm" class="feedback-form">
+        <form id="feedbackForm" class="feedback-form" onsubmit="return false;">
           <div class="form-group">
             <label for="feedbackText">Texto do Feedback</label>
             <textarea id="feedbackText" name="feedbackText" rows="5"
