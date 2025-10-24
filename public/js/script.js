@@ -27,66 +27,14 @@ class FeedbackAnalyzer {
         this.renderHistory();
     }
 
-    async analyzeSentiment(text) {
-        fetch(this.base_url + '/feedback-analysis', {
+    analyzeSentiment(text) {
+        return $.ajax({
+            url: this.base_url + '/feedback-analysis',
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json'
-            },
-            body: new URLSearchParams({
-                'text': text
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na requisição: ' + response.status);
-                }
-                return response.json(); // converte a resposta para JSON
-            })
-            .then(data => {
-                console.log('Resposta da API:', data);
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-            });
-return;
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Simple keyword-based sentiment analysis for demo purposes
-        const positiveWords = ['bom', 'ótimo', 'excelente', 'maravilhoso', 'perfeito', 'adorei', 'amei', 'incrível', 'fantástico', 'feliz', 'satisfeito'];
-        const negativeWords = ['ruim', 'péssimo', 'horrível', 'terrível', 'odiei', 'decepcionante', 'insatisfeito', 'problema', 'defeito', 'lento'];
-
-        const lowerText = text.toLowerCase();
-        let positiveCount = 0;
-        let negativeCount = 0;
-
-        positiveWords.forEach(word => {
-            if (lowerText.includes(word)) positiveCount++;
+            data: { text },
+            dataType: 'json',
+            timeout: 120000
         });
-
-        negativeWords.forEach(word => {
-            if (lowerText.includes(word)) negativeCount++;
-        });
-
-        let sentiment, score;
-
-        if (positiveCount > negativeCount) {
-            sentiment = 'POSITIVE';
-            score = 0.75 + (Math.random() * 0.24); // 0.75 - 0.99
-        } else if (negativeCount > positiveCount) {
-            sentiment = 'NEGATIVE';
-            score = 0.75 + (Math.random() * 0.24);
-        } else {
-            sentiment = 'NEUTRAL';
-            score = 0.50 + (Math.random() * 0.30);
-        }
-
-        return {
-            label: sentiment,
-            score: score
-        };
     }
 
     async handleSubmit(e) {
@@ -94,18 +42,25 @@ return;
 
         const textarea = document.getElementById('feedbackText');
         const text = textarea.value.trim();
-
         if (!text) return;
 
-        // Show loading state
         this.showLoading();
 
         try {
-            // Analyze sentiment
-            const result = await this.analyzeSentiment(text);
+            // Espera a Promise do $.ajax resolver
+            const data = await this.analyzeSentiment(text);
 
-            // Create feedback entry
-            const entry = {
+            if (data.code != '000') {
+                alert(data.message);
+                return;
+            }
+
+            let result = {
+                label: data.data.label,
+                score: data.data.score
+            };
+
+            let entry = {
                 id: Date.now(),
                 text: text,
                 sentiment: result.label,
@@ -113,26 +68,17 @@ return;
                 timestamp: new Date().toISOString()
             };
 
-            // Add to history
             this.history.unshift(entry);
             this.saveHistory();
-
-            // Update stats
             this.updateStatsCount(result.label);
-
-            // Display result
             this.displayResult(entry);
-
-            // Update UI
             this.renderHistory();
             this.updateStats();
 
-            // Clear form
             textarea.value = '';
-
         } catch (error) {
             console.error('Error analyzing feedback:', error);
-            alert('Erro ao analisar o feedback. Por favor, tente novamente.');
+            alert('Error analyzing feedback. Please try again.');
         }
     }
 
@@ -144,7 +90,7 @@ return;
                     <circle cx="32" cy="32" r="30" stroke="#e5e7eb" stroke-width="4"/>
                     <path d="M32 20V32L40 40" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
                 </svg>
-                <p>Analisando feedback...</p>
+                <p>Analyzing feedback...</p>
             </div>
         `;
     }
@@ -160,7 +106,7 @@ return;
                     <span class="sentiment-badge ${sentimentClass}">
                         ${this.getSentimentEmoji(entry.sentiment)} ${sentimentLabel}
                     </span>
-                    <span class="confidence-score">Confiança: ${(entry.score * 100).toFixed(1)}%</span>
+                    <span class="confidence-score">Confidence: ${(entry.score * 100).toFixed(1)}%</span>
                 </div>
                 <div class="feedback-text">${this.escapeHtml(entry.text)}</div>
             </div>
@@ -179,7 +125,7 @@ return;
                         <line x1="24" y1="32" x2="40" y2="32" stroke="#e5e7eb" stroke-width="4" stroke-linecap="round"/>
                         <line x1="24" y1="40" x2="32" y2="40" stroke="#e5e7eb" stroke-width="4" stroke-linecap="round"/>
                     </svg>
-                    <p>Nenhum histórico disponível</p>
+                    <p>No history available</p>
                 </div>
             `;
             return;
@@ -239,7 +185,7 @@ return;
     }
 
     clearHistory() {
-        if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+        if (confirm('Are you sure you want to clear all history?')) {
             this.history = [];
             this.stats = {
                 positive: 0,
@@ -257,8 +203,8 @@ return;
                         <circle cx="32" cy="32" r="30" stroke="#e5e7eb" stroke-width="4"/>
                         <path d="M32 20V32L40 40" stroke="#9ca3af" stroke-width="4" stroke-linecap="round"/>
                     </svg>
-                    <p>Nenhuma análise realizada ainda</p>
-                    <span>Digite um feedback acima e clique em "Analisar Sentimento"</span>
+                    <p>No analysis performed yet</p>
+                    <span>Type feedback above and click "Analyze Sentiment"</span>
                 </div>
             `;
         }
@@ -284,9 +230,9 @@ return;
 
     getSentimentLabel(sentiment) {
         const labels = {
-            'POSITIVE': 'Positivo',
-            'NEGATIVE': 'Negativo',
-            'NEUTRAL': 'Neutro'
+            'POSITIVE': 'Positive',
+            'NEGATIVE': 'Negative',
+            'NEUTRAL': 'Neutral'
         };
         return labels[sentiment] || sentiment;
     }
@@ -309,12 +255,12 @@ return;
         const hours = Math.floor(diff / 3600000);
         const days = Math.floor(diff / 86400000);
 
-        if (minutes < 1) return 'Agora mesmo';
-        if (minutes < 60) return `${minutes} minuto${minutes > 1 ? 's' : ''} atrás`;
-        if (hours < 24) return `${hours} hora${hours > 1 ? 's' : ''} atrás`;
-        if (days < 7) return `${days} dia${days > 1 ? 's' : ''} atrás`;
+        if (minutes < 1) return 'Just now';
+        if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
 
-        return date.toLocaleDateString('pt-BR');
+        return date.toLocaleDateString('en-US');
     }
 
     escapeHtml(text) {
@@ -329,4 +275,3 @@ let feedbackAnalyzer;
 document.addEventListener('DOMContentLoaded', () => {
     feedbackAnalyzer = new FeedbackAnalyzer();
 });
-

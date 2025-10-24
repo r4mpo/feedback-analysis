@@ -14,15 +14,15 @@
           </linearGradient>
         </defs>
       </svg>
-      <h1>Análise de Feedbacks</h1>
+      <h1>Feedback Analysis</h1>
     </div>
     <div class="header-stats">
       <div class="stat-item">
-        <span class="stat-label">Total Analisados</span>
+        <span class="stat-label">Total Analyzed</span>
         <span class="stat-value" id="totalAnalyzed">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Sentimento Médio</span>
+        <span class="stat-label">Average Sentiment</span>
         <span class="stat-value" id="avgSentiment">-</span>
       </div>
     </div>
@@ -33,12 +33,12 @@
     <!-- Input Section -->
     <section class="input-section">
       <div class="card">
-        <h2 class="section-title">Analisar Novo Feedback</h2>
+        <h2 class="section-title">Analyze New Feedback</h2>
         <form id="feedbackForm" class="feedback-form" onsubmit="return false;">
           <div class="form-group">
-            <label for="feedbackText">Texto do Feedback</label>
+            <label for="feedbackText">Feedback Text</label>
             <textarea id="feedbackText" name="feedbackText" rows="5"
-              placeholder="Digite ou cole o feedback do cliente aqui..." required></textarea>
+              placeholder="Type or paste the customer's feedback here..." required></textarea>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">
@@ -46,10 +46,10 @@
                 <path d="M10 3V17M10 17L15 12M10 17L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round" />
               </svg>
-              Analisar Sentimento
+              Analyze Sentiment
             </button>
             <button type="button" class="btn btn-secondary" id="clearBtn">
-              Limpar
+              Clear
             </button>
           </div>
         </form>
@@ -59,15 +59,15 @@
     <!-- Results Section -->
     <section class="results-section">
       <div class="card">
-        <h2 class="section-title">Resultado da Análise</h2>
+        <h2 class="section-title">Analysis Result</h2>
         <div id="resultContainer" class="result-container">
           <div class="empty-state">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" stroke="#e5e7eb" stroke-width="4" />
               <path d="M32 20V32L40 40" stroke="#9ca3af" stroke-width="4" stroke-linecap="round" />
             </svg>
-            <p>Nenhuma análise realizada ainda</p>
-            <span>Digite um feedback acima e clique em "Analisar Sentimento"</span>
+            <p>No analysis performed yet</p>
+            <span>Enter feedback above and click "Analyze Sentiment"</span>
           </div>
         </div>
       </div>
@@ -77,8 +77,8 @@
     <section class="history-section">
       <div class="card">
         <div class="section-header">
-          <h2 class="section-title">Histórico de Análises</h2>
-          <button class="btn btn-text" id="clearHistoryBtn">Limpar Histórico</button>
+          <h2 class="section-title">Analysis History</h2>
+          <button class="btn btn-text" id="clearHistoryBtn">Clear History</button>
         </div>
         <div id="historyContainer" class="history-container">
           <div class="empty-state">
@@ -88,7 +88,7 @@
               <line x1="24" y1="32" x2="40" y2="32" stroke="#e5e7eb" stroke-width="4" stroke-linecap="round" />
               <line x1="24" y1="40" x2="32" y2="40" stroke="#e5e7eb" stroke-width="4" stroke-linecap="round" />
             </svg>
-            <p>Nenhum histórico disponível</p>
+            <p>No history available</p>
           </div>
         </div>
       </div>
@@ -97,33 +97,32 @@
     <!-- Statistics Section -->
     <section class="stats-section">
       <div class="card">
-        <h2 class="section-title">Estatísticas Gerais</h2>
+        <h2 class="section-title">Overall Statistics</h2>
         <div class="stats-grid">
           <div class="stat-card positive">
             <div class="stat-icon">😊</div>
             <div class="stat-content">
               <span class="stat-number" id="positiveCount">0</span>
-              <span class="stat-text">Positivos</span>
+              <span class="stat-text">Positive</span>
             </div>
           </div>
           <div class="stat-card neutral">
             <div class="stat-icon">😐</div>
             <div class="stat-content">
               <span class="stat-number" id="neutralCount">0</span>
-              <span class="stat-text">Neutros</span>
+              <span class="stat-text">Neutral</span>
             </div>
           </div>
           <div class="stat-card negative">
             <div class="stat-icon">😞</div>
             <div class="stat-content">
               <span class="stat-number" id="negativeCount">0</span>
-              <span class="stat-text">Negativos</span>
+              <span class="stat-text">Negative</span>
             </div>
           </div>
         </div>
       </div>
     </section>
   </main>
-
 
   <?php require_once __DIR__ . '/templates/footer.php'; ?>
