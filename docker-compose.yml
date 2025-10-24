@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: meu_transformer
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
